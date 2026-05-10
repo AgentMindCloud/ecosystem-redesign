@@ -195,13 +195,30 @@ Under the D2 fallback (placeholder repo), only `lint.yml` and `publish-pypi.yml`
 - The frontend / vscode / skills surfaces ship as OPTIONAL only; if Phase 3a runs hot, they slip to v1.1 without changing v1.0's CORE definition.
 - A second brand palette. xlOS reuses grok-install-v2's tokens with a single accent override per section 5.
 
-## 8. Open questions for human review
+## 8. Open questions — RESOLVED 2026-05-11
 
-Extraction-feasibility risk is the dominant unknown for xlOS. Items 1–3 below are extraction-related; flag any that you read as red and the D2 fallback (xlOS v1.0 = README + LICENSE only) becomes the realistic plan rather than the safety net.
+All 6 questions resolved before merge. The dominant resolution is Q1's hard time-box, which makes the D2 fallback decision mechanical rather than tasteful. This section preserved as record.
 
-1. **Extraction feasibility from `grok-agent-orchestra` is materially uncertain.** PORTFOLIO-MAP.md inventories the gems with these port estimates: patterns 12h, safety_veto 8h, simulated runtime 10h, streaming TUI 8h, sources 20h integration testing, frontend 40h port, vscode extension 12h, plus a handful of "keep verbatim" gems that still need re-wiring to a new package name. Cumulative core-only port budget is ~58 hours of focused work before any examples run; with research/voice/swarm placeholders deferred, ~38h. If Phase 3a is bounded to one focused sprint (≤40h), then `frontend/`, `extensions/vscode/`, and `sources/` may need to ship as v1.1, and the README must explicitly state which CORE/OPTIONAL items did and did not land. Recommend setting a hard time-box upfront — "30 working hours, then ship what's done; if patterns + safety + runtimes + playground are not all green, fall back to D2 placeholder" — so the fallback decision is mechanical rather than tasteful. Confirm the time-box and the fallback trigger conditions.
-2. **`combined.py` relocation (mirrors grok-install-v2 Q1).** PORTFOLIO-MAP.md targets it for grok-install-v2; this architecture relocates it to `orchestration/combined.py` so the standalone grok-install Bridge pipeline (safety_audit + builder + deploy) doesn't pull xlOS as a runtime dependency. Confirm the relocation.
-3. **Bridge ↔ Lucas-veto integration contract.** D2 puts the Lucas-veto code in `xlOS/safety/lucas-veto/`, but `grok-install-v2`'s Bridge pipeline (in `cli/src/grok_install/safety_audit/`) historically calls Lucas as part of its dual-layer safety. Options for v1.0: (a) `grok-install-v2`'s Bridge ships WITHOUT the Lucas step; an opt-in `--lucas-via xlos` flag wires it in when xlOS is also installed. (b) The Lucas implementation is duplicated/forked between repos. (c) `xlOS` exposes a stable JSON-mode HTTP/CLI endpoint that grok-install-v2 calls. Recommend (a) — cleanest separation, no duplication, optional dep. Confirm.
-4. **`research/` placeholder vs deletion.** D1 names "voice/swarm research surfaces" as a future xlOS surface; section 2 shows `research/` as OPTIONAL with a placeholder README. If Phase 3a is already constrained to the time-box in Q1, even the placeholder README may be unnecessary scaffolding at v1.0. Confirm `research/` ships with a placeholder README or is deferred entirely to v1.1.
-5. **Multi-agent client placement.** Section 2 promotes `multi_agent_client.py` to `runtimes/` as CORE; PORTFOLIO-MAP.md tags it "archive-as-reference." If either runtime can stand without it (e.g., native runtime talks directly to xAI), the file becomes OPTIONAL. Confirm it is required by both runtimes.
-6. **`grok-paradoxes` reference from xlOS.** D3 says the package is grok-install-v2 (primary) "+ reference from xlOS." Section 3 does not list a `packages/grok-paradoxes/` directory in xlOS because the package is consumed via `pip install grok-paradoxes` rather than checked in. Confirm the reference-only model is correct (alternative: a small `xlos.paradoxes` shim that re-exports for ergonomic imports). Recommend reference-only — no shim — to avoid drift.
+1. **Q1 — Extraction time-box → 40 WORKING HOURS, MECHANICAL FALLBACK.**
+
+   Phase 3a is hard-bounded to 40 working hours. The GREEN BAR for shipping xlOS v1.0 functional (not D2-fallback placeholder) is:
+   - All 5 orchestration patterns implemented and validated (`orchestration/patterns/`)
+   - Both runtimes working — xAI-native and simulated (`runtimes/native.py` + `runtimes/simulated.py` + `runtimes/multi_agent_client.py`)
+   - Lucas-veto safety pattern implemented with strict-JSON contract (`safety/lucas-veto/`)
+   - Live YAML playground rendering and validating (`playground/`)
+   - At least 1 executable example per pattern in `examples/` (5 minimum)
+   - All 4 CI workflows green
+
+   If the GREEN BAR is not 100% met at the 40h mark, xlOS v1.0 ships as the D2 placeholder (README + LICENSE + NOTICE only) and the orchestration migration moves to v1.1. The decision is mechanical — no judgment calls, no "almost done" extensions. Time-box hit, GREEN BAR check, ship or fallback.
+
+   Items explicitly NOT in the 40h budget (all v1.1 regardless of how Phase 3a goes): `frontend/`, `extensions/vscode/`, `skills/`, `benchmarks/`, `orchestration/sources/` (the Tavily/MCP integrations specifically). These remain OPTIONAL in section 2 and ship in v1.1 as separate efforts.
+
+2. **Q2 — `combined.py` relocation → CONFIRMED.** Lives at `xlOS/orchestration/combined.py`. Mirror of grok-install-v2 Q1.
+
+3. **Q3 — Bridge ↔ Lucas-veto contract → OPTION (a).** grok-install-v2's Bridge pipeline ships WITHOUT the Lucas step at v1.0. An opt-in `--lucas-via xlos` flag on `grok-install scan` wires Lucas in when the `xlos` package is also installed. No duplication, no HTTP endpoint, no forced runtime dependency. Documented in both repos' READMEs.
+
+4. **Q4 — `research/` placeholder → KEEP, MINIMAL.** `research/README.md` ships as a single line: "Voice and swarm research surfaces planned for v1.1. See DECISIONS.md D1." Honors D1's explicit naming of the surface; costs ~5 minutes; not real scaffolding. The directory itself stays in section 2 as OPTIONAL.
+
+5. **Q5 — `multi_agent_client.py` placement → CORE in `runtimes/`.** Both `native.py` and `simulated.py` depend on it for the streaming wrapper and `MultiAgentEvent` dataclass. PORTFOLIO-MAP.md's "archive-as-reference" tag was wrong; promotion to CORE per layout divergence note in section 2 is correct.
+
+6. **Q6 — `grok-paradoxes` reference → REFERENCE-ONLY via pip.** No `xlos.paradoxes` shim. xlOS depends on `grok-paradoxes` as a normal pip package. Avoids drift between the two repos. Documented in xlOS's pyproject.toml `dependencies =` list.
