@@ -15,6 +15,8 @@ The portfolio consolidates into two fresh repos:
 
 The old "consumer vs developer" split is dropped. grok-install-v2 is the stable thing. xlOS is the lab.
 
+Per Q1 resolution: the simple-agent count above is provisional. The exact deduped total across `grok-install/templates/` + `awesome-grok-agents/` (CLI examples excluded) is computed and locked during Phase 2b. An `amend(decisions): update D1 simple-agent count to <N>` commit follows.
+
 ## D2 — Resolution of Contradiction 1 (xlOS scope sources)
 
 PORTFOLIO-MAP.md's summary mentioned xlOS getting multi-agent orchestration + Lucas veto + live YAML playground, but the per-repo dispositions marked the source repos as ARCHIVE_NO_MIGRATION or MIGRATE_TO_GROK_INSTALL_V2 — no path for the content to actually reach xlOS.
@@ -76,8 +78,8 @@ The names "Living Narrative Fabric", "Self-Evolving Personal OS", "Cross-Reality
 | Old name | New name | Slug |
 |---|---|---|
 | Living Narrative Fabric | Multi-source narrative synthesizer | narrative-synthesizer |
-| Self-Evolving Personal OS | Personal-context briefing agent | personal-briefing |
-| Cross-Reality Action Fabric | Windows + web action runner | action-runner |
+| Self-Evolving Personal OS | Personal-context agent | personal-context-agent |
+| Cross-Reality Action Fabric | Windows + web + X action runner | action-runner |
 | Agent Swarm With Shared Memory | (keep — already literal) | agent-swarm |
 | Provenance-First Trust Engine | (keep — already literal) | provenance-trust |
 | Narrative Contradiction Detector | (keep — already literal) | contradiction-detector |
@@ -144,6 +146,7 @@ Deferred:
 - Real-time analytics dashboards
 - v2.15 RFC
 - Multiple language ports
+- bridge_live/ FastAPI inspector (deferred per Q5 resolution; needs 8h security fix list before shipping)
 
 ## D12 — Pre-build quick wins (Phase 0.6) — COMPLETED 2026-05-11
 
@@ -180,10 +183,16 @@ Reproduced from PORTFOLIO-MAP.md's executive summary, with the D2 amendment appl
 | `grok-agents-marketplace` | `MIGRATE_TO_GROK_INSTALL_V2` | `grok-install-v2/marketplace/` | Mess: Low. Next.js 15 storefront anchors the v2 marketplace per D10. grok-agent's internal `marketplace/` is dropped. Telemetry (Vercel KV + 5 stats endpoints) + 17 vitest cases keep verbatim. |
 | `Frok` | `ARCHIVE_NO_MIGRATION` | n/a | Empty repo (LICENSE only). One-click archive. |
 
-## Open questions for human review
+## Open questions — RESOLVED 2026-05-11
 
-1. **D1 "8 simple" agent count.** D1 quotes "~41 agents (8 simple + 22 creator + 4 finance + 7 super)". The 8 simple agents most plausibly map to `grok-install/templates/` (AlphaSignalBot, AskMe, DailyBrief, DevPilot, DogeDoughAI, ShowNotes, VibeReply, VisualForge), but `awesome-grok-agents` ships 10 additional certified templates and `grok-install-cli/examples/` adds 4 more. Confirm whether (a) only the 8 grok-install templates count and the awesome-grok-agents 10 are tracked separately, (b) all 18 simple-tier templates merge into one set (total ~51 agents instead of 41), or (c) some other consolidation. Affects marketplace category counts and the "~41 agents" public claim.
-2. **D6 "Personal-context briefing agent" scope.** PORTFOLIO-MAP.md describes Self-Evolving Personal OS as having "auto-evolving workflows based on user patterns, morning briefing synthesis, rewind, explicit consent gates". The new name `personal-briefing` captures the briefing slice cleanly but understates the auto-evolving-workflow aspect. Confirm `personal-briefing` is the intended scope and the workflow-evolution behavior stays in scope under that name, or pick a more inclusive slug (e.g. `personal-context-agent`).
-3. **D6 "Windows + web action runner" scope.** PORTFOLIO-MAP.md describes Cross-Reality Action Fabric as "Windows actions + X posting + web actions; every action gated by consent with reversibility log". The new name covers Windows + web but elides the X-posting surface, which is a primary use case. Confirm the slug `action-runner` is meant generically (covers X-posting too) or rename the display name to "Windows + web + X action runner".
-4. **`grok-agent/extensions/vscode/` consolidation.** PORTFOLIO-MAP.md flags this as a candidate for consolidation with `vscode-grok-yaml`. D5 covers the schema-regime collapse but doesn't explicitly say which extension code base wins. Default assumption: `vscode-grok-yaml` is the survivor, `grok-agent/extensions/vscode/` is mined for any unique IntelliSense/lint logic and then archived. Confirm or override.
-5. **`grok-build-bridge/bridge_live/` FastAPI inspector.** PORTFOLIO-MAP.md targets it for `grok-install-v2` as a separate `-services` package, with an 8h fix list (`/tmp` race, non-root, `/static` cap). Confirm this is in v1.0 scope or defer to v1.1.
+All 5 review questions resolved before merge. Resolutions locked into the relevant Dn sections below; this section is preserved as a record.
+
+1. **D1 agent count → MERGE WITH DEDUP, DROP CLI EXAMPLES.** The 4 templates in `grok-install-cli/examples/` are CLI demo material and do NOT count toward the production set. The 8 in `grok-install/templates/` and the 10 in `awesome-grok-agents/` merge into ONE production simple-tier set after deduplicating any overlapping slugs. The deduped real count is computed during Phase 2b migration and D1's "~41 agents" claim is amended to the exact deduped total at that point (`amend(decisions): update D1 simple-agent count to <N>`). Public claim never inflates — exact number always.
+
+2. **D6 `personal-briefing` → RENAMED to `personal-context-agent`.** "Briefing" understated the scope (auto-evolving workflows, rewind, consent gates). New slug carries the full Self-Evolving Personal OS scope without word-salad. Update D6 row.
+
+3. **D6 `action-runner` → SLUG KEPT, display name expanded.** Slug stays `action-runner` (matches `goal-agent`, `agent-swarm` short-slug convention). Display name in D6 changes to "Windows + web + X action runner" to surface the X-posting use case. Marketplace description leads with all three surfaces.
+
+4. **D5 VSCode extension consolidation → CONFIRMED.** `vscode-grok-yaml` is the survivor (proper marketplace publishing pipeline). `grok-agent/extensions/vscode/` is mined for any unique IntelliSense/lint logic in Phase 2c, with an explicit feature-comparison step before archive so nothing drops silently. Add this step to Phase 2c's prompt when it's drafted.
+
+5. **D11 `bridge_live/` FastAPI inspector → DEFERRED to v1.1.** The 8h security fix list (/tmp race, non-root, /static cap) is real hardening work; v1.0 launch scope is already aggressive; adding a 4th process surface alongside CLI + Worker + Pages is unnecessary attack-surface and ops complexity at launch. Ships cleanly in v1.1.
