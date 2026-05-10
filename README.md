@@ -7,6 +7,9 @@ ecosystem around two clean repos (`grok-install-v2` and `xlOS`) and retires the
 
 ## Current phase
 
-**Phase 0 — Portfolio Map.** See [PORTFOLIO-MAP.md](./PORTFOLIO-MAP.md) for the
-full inventory: every repo, every gem worth preserving, and the recommended
-disposition for each repo.
+**Phase 1 — Architecture documents** (next).
+
+Completed phases:
+- Phase 0 — Portfolio Map. See [PORTFOLIO-MAP.md](./PORTFOLIO-MAP.md).
+- Phase 0.5 — Decisions Lock-in. See [DECISIONS.md](./DECISIONS.md).
+- Phase 0.6 — Pre-build quick wins (7 PRs across legacy repos, recorded in DECISIONS.md D12).
